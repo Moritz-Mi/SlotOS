@@ -44,27 +44,51 @@ public enum UserRole
 
 ---
 
-## Phase 2: Authentifizierungs-System
+## Phase 2: Authentifizierungs-System ✅ ABGESCHLOSSEN
 
-### 2.1 PasswordHasher-Klasse
+### 2.1 PasswordHasher-Klasse ✅
 **Datei:** `PasswordHasher.cs`
 
 **Funktionen:**
-- `string Hash(string password)` - Passwort hashen (SHA256 oder besser)
+- `string Hash(string password)` - Passwort hashen mit Salt
 - `bool Verify(string password, string hash)` - Hash überprüfen
 - Salt-Generierung für zusätzliche Sicherheit
+- Mehrfache Hash-Iterationen (1000 Runden)
+- Abwärtskompatibilität mit altem Hash-Format
 
-### 2.2 AuthenticationManager-Klasse
+**Implementiert am:** 2025-10-06
+
+### 2.2 AuthenticationManager-Klasse ✅
 **Datei:** `AuthenticationManager.cs`
 
 **Eigenschaften:**
 - `User CurrentUser` - Aktuell angemeldeter Benutzer
 - `bool IsAuthenticated` - Login-Status
+- `DateTime LastActivity` - Zeitpunkt der letzten Aktivität
 
 **Methoden:**
 - `bool Login(string username, string password)` - Benutzer anmelden
 - `void Logout()` - Benutzer abmelden
 - `bool RequireAdmin()` - Admin-Rechte prüfen
+- `void RequireAuthentication()` - Authentifizierung prüfen
+- `bool IsSessionExpired()` - Session-Timeout prüfen
+- `int GetRemainingLoginAttempts()` - Verbleibende Versuche
+
+**Zusätzliche Features:**
+- Login-Versuche limitieren (max. 3 Versuche)
+- Automatische Sperrung nach Fehlversuchen (30 Sekunden)
+- Session-Timeout-Verwaltung
+- Aktivitäts-Tracking
+
+**Implementiert am:** 2025-10-06
+
+### 2.3 User-Klasse Integration ✅
+- `VerifyPassword()` nutzt jetzt `PasswordHasher.Verify()`
+- `UpdatePassword()` nutzt jetzt `PasswordHasher.Hash()`
+- Alte `ComputeHash()` Methode entfernt
+- Vollständige Abwärtskompatibilität gewährleistet
+
+**Aktualisiert am:** 2025-10-06
 
 ---
 
@@ -244,15 +268,15 @@ protected override void Run()
 
 ## Implementierungs-Reihenfolge
 
-### Sprint 1: Grundlagen (Woche 1)
-- [ ] User-Klasse und UserRole Enum
-- [ ] PasswordHasher implementieren
+### Sprint 1: Grundlagen (Woche 1) ✅
+- [x] User-Klasse und UserRole Enum
+- [x] PasswordHasher implementieren
 - [ ] Grundlegende UserManager-Funktionen
 
-### Sprint 2: Authentifizierung (Woche 2)
-- [ ] AuthenticationManager erstellen
-- [ ] Login-Screen implementieren
-- [ ] Logout-Funktionalität
+### Sprint 2: Authentifizierung (Woche 2) ✅
+- [x] AuthenticationManager erstellen
+- [ ] Login-Screen implementieren (Teil von Phase 5)
+- [x] Logout-Funktionalität
 
 ### Sprint 3: Persistenz (Woche 3)
 - [ ] VFS in Cosmos einrichten

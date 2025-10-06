@@ -92,11 +92,8 @@ namespace SlotOS.System
             if (string.IsNullOrWhiteSpace(password))
                 return false;
 
-            // Hash des eingegebenen Passworts berechnen
-            string inputHash = ComputeHash(password);
-
-            // Mit gespeichertem Hash vergleichen
-            return PasswordHash == inputHash;
+            // Verwende PasswordHasher für sichere Verifikation
+            return PasswordHasher.Verify(password, PasswordHash);
         }
 
         /// <summary>
@@ -111,7 +108,8 @@ namespace SlotOS.System
             if (newPassword.Length < 4)
                 throw new ArgumentException("Passwort muss mindestens 4 Zeichen lang sein", nameof(newPassword));
 
-            PasswordHash = ComputeHash(newPassword);
+            // Verwende PasswordHasher für sicheres Hashing
+            PasswordHash = PasswordHasher.Hash(newPassword);
         }
 
         /// <summary>
@@ -129,29 +127,6 @@ namespace SlotOS.System
         public bool IsAdmin()
         {
             return Role == UserRole.Admin;
-        }
-
-        #endregion
-
-        #region Private Hilfsmethoden
-
-        /// <summary>
-        /// Berechnet einen einfachen Hash für das Passwort
-        /// HINWEIS: Dies ist eine vereinfachte Implementierung für Cosmos OS.
-        /// In einer Produkteionsumgebung sollte ein sicherer Algorithmus wie SHA256 mit Salt verwendet werden.
-        /// </summary>
-        /// <param name="password">Passwort im Klartext</param>
-        /// <returns>Hash-String</returns>
-        private string ComputeHash(string password)
-        {
-            // Einfacher Hash-Algorithmus für Cosmos OS
-            // TODO: Später durch SHA256 oder stärkeren Algorithmus ersetzen
-            int hash = 17;
-            foreach (char c in password)
-            {
-                hash = hash * 31 + c;
-            }
-            return hash.ToString("X8");
         }
 
         #endregion
