@@ -92,9 +92,9 @@ public enum UserRole
 
 ---
 
-## Phase 3: Benutzerverwaltung
+## Phase 3: Benutzerverwaltung ✅ ABGESCHLOSSEN
 
-### 3.1 UserManager-Klasse
+### 3.1 UserManager-Klasse ✅
 **Datei:** `UserManager.cs`
 
 **Funktionen:**
@@ -104,11 +104,27 @@ public enum UserRole
 - `List<User> GetAllUsers()` - Alle Benutzer auflisten
 - `bool UpdateUser(User user)` - Benutzerdaten aktualisieren
 - `bool ChangePassword(string username, string oldPassword, string newPassword)` - Passwort ändern
+- `bool ResetPassword(string username, string newPassword)` - Passwort zurücksetzen (Admin)
 - `bool UserExists(string username)` - Prüfen ob Benutzer existiert
+- `bool SetUserActive(string username, bool isActive)` - Benutzer aktivieren/deaktivieren
+- `string GetStatistics()` - Statistiken über Benutzer abrufen
 
-### 3.2 Standard-Administrator erstellen
+**Zusätzliche Features:**
+- Singleton-Pattern für zentrale Verwaltung
+- Schutz vor Löschung/Deaktivierung des letzten Administrators
+- Passwortvalidierung (mindestens 4 Zeichen)
+- Benutzernamen-Validierung
+- Automatische Home-Verzeichnis-Zuweisung
+
+**Implementiert am:** 2025-10-21
+
+### 3.2 Standard-Administrator erstellen ✅
 - Bei Erststart: Admin-Account mit Default-Passwort anlegen
-- Nutzer muss beim ersten Login Passwort ändern
+- Standard-Benutzername: `admin`
+- Standard-Passwort: `admin`
+- Nutzer sollte beim ersten Login Passwort ändern
+
+**Implementiert am:** 2025-10-21
 
 ---
 
@@ -271,7 +287,7 @@ protected override void Run()
 ### Sprint 1: Grundlagen (Woche 1) ✅
 - [x] User-Klasse und UserRole Enum
 - [x] PasswordHasher implementieren
-- [ ] Grundlegende UserManager-Funktionen
+- [x] Grundlegende UserManager-Funktionen
 
 ### Sprint 2: Authentifizierung (Woche 2) ✅
 - [x] AuthenticationManager erstellen

@@ -13,6 +13,9 @@ namespace SlotOS.System
         
         // Trennzeichen zwischen Salt und Hash
         private const char SEPARATOR = ':';
+        
+        // Statischer Zähler für zusätzliche Entropie
+        private static int _saltCounter = 0;
 
         /// <summary>
         /// Hasht ein Passwort mit einem zufällig generierten Salt
@@ -80,10 +83,20 @@ namespace SlotOS.System
             // Cosmos OS hat eingeschränkten Zugriff auf Krypto-Funktionen
             // Verwende eine kombinierte Methode aus Zeit und pseudo-zufälligen Werten
             
-            var random = new Random((int)DateTime.Now.Ticks);
+            // Erhöhe Zähler für Einzigartigkeit
+            _saltCounter++;
+            
+            // Kombiniere mehrere Entropiequellen für bessere Zufälligkeit
+            int seed = (int)(DateTime.Now.Ticks ^ (_saltCounter * 1000000) ^ DateTime.Now.Millisecond);
+            var random = new Random(seed);
             var saltBytes = new byte[SALT_LENGTH];
             
-            for (int i = 0; i < SALT_LENGTH; i++)
+            // Fülle die ersten 4 Bytes mit dem Zähler für garantierte Einzigartigkeit
+            byte[] counterBytes = BitConverter.GetBytes(_saltCounter);
+            Buffer.BlockCopy(counterBytes, 0, saltBytes, 0, 4);
+            
+            // Fülle den Rest mit Zufallswerten
+            for (int i = 4; i < SALT_LENGTH; i++)
             {
                 saltBytes[i] = (byte)random.Next(0, 256);
             }
