@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Sys = Cosmos.System;
 using SlotOS.System;
+using Sys = Cosmos.System;
 
 namespace SlotOS
 {
     public class Kernel : Sys.Kernel
     {
-
         protected override void BeforeRun()
         {
             Console.WriteLine("SlotOS gestartet!");
@@ -21,7 +20,7 @@ namespace SlotOS
         {
             Console.Write("SlotOS> ");
             var input = Console.ReadLine();
-            
+
             if (string.IsNullOrWhiteSpace(input))
                 return;
 
@@ -30,19 +29,28 @@ namespace SlotOS
             switch (command)
             {
                 case "test":
-                    // Führe Systemtests aus
+                    // Führe Systemtests aus (Phase 1-3)
                     Console.WriteLine();
                     UserSystemTest.RunAllTests();
+                    Console.WriteLine();
+                    break;
+
+                case "testmemory":
+                case "testp4":
+                    // Führe In-Memory Tests aus (Phase 4)
+                    Console.WriteLine();
+                    InMemoryTest.RunAllTests();
                     Console.WriteLine();
                     break;
 
                 case "help":
                     Console.WriteLine();
                     Console.WriteLine("Verfügbare Befehle:");
-                    Console.WriteLine("  test  - Führt Tests für Phase 1 & 2 aus");
-                    Console.WriteLine("  help  - Zeigt diese Hilfe an");
-                    Console.WriteLine("  clear - Löscht den Bildschirm");
-                    Console.WriteLine("  exit  - Beendet das System");
+                    Console.WriteLine("  test       - Führt Tests für Phase 1-3 aus");
+                    Console.WriteLine("  testp4     - Führt In-Memory Tests für Phase 4 aus");
+                    Console.WriteLine("  help       - Zeigt diese Hilfe an");
+                    Console.WriteLine("  clear      - Löscht den Bildschirm");
+                    Console.WriteLine("  exit       - Beendet das System");
                     Console.WriteLine();
                     break;
 

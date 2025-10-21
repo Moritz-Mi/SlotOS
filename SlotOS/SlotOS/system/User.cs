@@ -51,9 +51,7 @@ namespace SlotOS.System
         /// <summary>
         /// Standardkonstruktor für Serialisierung
         /// </summary>
-        public User()
-        {
-        }
+        public User() { }
 
         /// <summary>
         /// Erstellt einen neuen Benutzer mit den angegebenen Werten
@@ -67,7 +65,10 @@ namespace SlotOS.System
                 throw new ArgumentException("Benutzername darf nicht leer sein", nameof(username));
 
             if (string.IsNullOrWhiteSpace(passwordHash))
-                throw new ArgumentException("Passwort-Hash darf nicht leer sein", nameof(passwordHash));
+                throw new ArgumentException(
+                    "Passwort-Hash darf nicht leer sein",
+                    nameof(passwordHash)
+                );
 
             Username = username;
             PasswordHash = passwordHash;
@@ -103,10 +104,16 @@ namespace SlotOS.System
         public void UpdatePassword(string newPassword)
         {
             if (string.IsNullOrWhiteSpace(newPassword))
-                throw new ArgumentException("Neues Passwort darf nicht leer sein", nameof(newPassword));
+                throw new ArgumentException(
+                    "Neues Passwort darf nicht leer sein",
+                    nameof(newPassword)
+                );
 
             if (newPassword.Length < 4)
-                throw new ArgumentException("Passwort muss mindestens 4 Zeichen lang sein", nameof(newPassword));
+                throw new ArgumentException(
+                    "Passwort muss mindestens 4 Zeichen lang sein",
+                    nameof(newPassword)
+                );
 
             // Verwende PasswordHasher für sicheres Hashing
             PasswordHash = PasswordHasher.Hash(newPassword);
@@ -143,11 +150,11 @@ namespace SlotOS.System
                 UserRole.Admin => "Admin",
                 UserRole.Standard => "User",
                 UserRole.Guest => "Guest",
-                _ => "Unknown"
+                _ => "Unknown",
             };
 
             string statusStr = IsActive ? "Aktiv" : "Inaktiv";
-            
+
             return $"{Username} ({roleStr}) - {statusStr}";
         }
 

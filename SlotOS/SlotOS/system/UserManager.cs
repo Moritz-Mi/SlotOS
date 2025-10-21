@@ -70,6 +70,7 @@ namespace SlotOS.System
         private UserManager()
         {
             _users = new List<User>();
+            // In-Memory-Modus: Alle Daten nur im RAM
         }
 
         #endregion
@@ -77,14 +78,18 @@ namespace SlotOS.System
         #region Initialisierung
 
         /// <summary>
-        /// Initialisiert den UserManager und erstellt bei Bedarf den Standard-Admin
+        /// Initialisiert den UserManager im In-Memory-Modus
+        /// Erstellt bei Bedarf den Standard-Admin
         /// </summary>
         public void Initialize()
         {
-            // Prüfen ob bereits Benutzer existieren
+            Console.WriteLine("[UserManager] In-Memory-Modus: Keine Persistenz, nur RAM");
+
+            // Prüfen ob bereits Benutzer existieren (im Speicher)
             if (_users.Count == 0)
             {
                 CreateDefaultAdmin();
+                Console.WriteLine("[UserManager] Standard-Admin erstellt (admin/admin)");
             }
         }
 
@@ -252,7 +257,6 @@ namespace SlotOS.System
             existingUser.IsActive = user.IsActive;
             existingUser.HomeDirectory = user.HomeDirectory;
             existingUser.LastLogin = user.LastLogin;
-
             return true;
         }
 

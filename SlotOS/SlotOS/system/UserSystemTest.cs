@@ -506,7 +506,7 @@ namespace SlotOS.System
             {
                 var manager = UserManager.Instance;
                 manager.ClearAllUsers(); // Cleanup
-                manager.Initialize();
+                manager.Initialize(); // In-Memory-Modus
 
                 bool hasDefaultAdmin = manager.UserExists(UserManager.DEFAULT_ADMIN_USERNAME);
                 var admin = manager.GetUser(UserManager.DEFAULT_ADMIN_USERNAME);
@@ -530,6 +530,7 @@ namespace SlotOS.System
             {
                 var manager = UserManager.Instance;
                 manager.ClearAllUsers();
+                // In-Memory-Modus: Kein Auto-Save nötig
 
                 bool created = manager.CreateUser("testuser", "testpass", UserRole.Standard);
                 bool exists = manager.UserExists("testuser");
@@ -553,7 +554,7 @@ namespace SlotOS.System
             {
                 var manager = UserManager.Instance;
                 manager.ClearAllUsers();
-                manager.Initialize(); // Erstellt Admin
+                manager.Initialize(); // In-Memory-Modus, erstellt Admin
 
                 manager.CreateUser("deleteMe", "pass", UserRole.Standard);
                 bool existedBefore = manager.UserExists("deleteMe");
@@ -579,6 +580,7 @@ namespace SlotOS.System
             {
                 var manager = UserManager.Instance;
                 manager.ClearAllUsers();
+                // In-Memory-Modus: Kein Auto-Save nötig
 
                 manager.CreateUser("findMe", "pass", UserRole.Standard);
                 var user = manager.GetUser("findMe");
@@ -602,6 +604,7 @@ namespace SlotOS.System
             {
                 var manager = UserManager.Instance;
                 manager.ClearAllUsers();
+                // In-Memory-Modus: Kein Auto-Save nötig
 
                 manager.CreateUser("updateMe", "pass", UserRole.Standard);
                 var user = manager.GetUser("updateMe");
@@ -631,6 +634,7 @@ namespace SlotOS.System
             {
                 var manager = UserManager.Instance;
                 manager.ClearAllUsers();
+                // In-Memory-Modus: Kein Auto-Save nötig
 
                 manager.CreateUser("passChange", "oldpass", UserRole.Standard);
                 bool changed = manager.ChangePassword("passChange", "oldpass", "newpass");
@@ -657,6 +661,7 @@ namespace SlotOS.System
             {
                 var manager = UserManager.Instance;
                 manager.ClearAllUsers();
+                // In-Memory-Modus: Kein Auto-Save nötig
 
                 manager.CreateUser("resetMe", "oldpass", UserRole.Standard);
                 bool reset = manager.ResetPassword("resetMe", "resetpass");
@@ -682,6 +687,7 @@ namespace SlotOS.System
             {
                 var manager = UserManager.Instance;
                 manager.ClearAllUsers();
+                // In-Memory-Modus: Kein Auto-Save nötig
 
                 bool notExistsBefore = !manager.UserExists("checkMe");
                 manager.CreateUser("checkMe", "pass", UserRole.Standard);
@@ -705,7 +711,7 @@ namespace SlotOS.System
             {
                 var manager = UserManager.Instance;
                 manager.ClearAllUsers();
-                manager.Initialize(); // Erstellt einen Admin
+                manager.Initialize(); // In-Memory-Modus, erstellt Admin
 
                 bool exceptionThrown = false;
                 try
@@ -737,6 +743,7 @@ namespace SlotOS.System
             {
                 var manager = UserManager.Instance;
                 manager.ClearAllUsers();
+                // In-Memory-Modus: Kein Auto-Save nötig
 
                 manager.CreateUser("admin1", "pass", UserRole.Admin);
                 manager.CreateUser("user1", "pass", UserRole.Standard);

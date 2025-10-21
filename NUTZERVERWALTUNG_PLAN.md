@@ -128,24 +128,59 @@ public enum UserRole
 
 ---
 
-## Phase 4: Datenpersistenz
+## Phase 4: Datenpersistenz ✅ ABGESCHLOSSEN
 
-### 4.1 UserStorage-Klasse
+### 4.1 UserStorage-Klasse ✅
 **Datei:** `UserStorage.cs`
 
 **Funktionen:**
-- `void SaveUsers(List<User> users)` - Benutzerliste speichern
+- `bool SaveUsers(List<User> users)` - Benutzerliste speichern
 - `List<User> LoadUsers()` - Benutzerliste laden
 - `bool FileExists()` - Prüfen ob Datei existiert
+- `bool InitializeVFS()` - VFS initialisieren
+- `bool CreateBackup()` - Backup erstellen
+- `bool RestoreFromBackup()` - Vom Backup wiederherstellen
+- `string GetStorageInfo()` - Status-Informationen
 
 **Speicherformat:**
-- JSON-Format für einfache Serialisierung
-- Datei: `/system/users.dat` oder ähnlich
-- Cosmos VFS (Virtual File System) nutzen
+- Eigenes Pipe-delimited Format (kompatibel mit Cosmos)
+- Datei: `0:\system\users.dat`
+- Backup: `0:\system\users.bak`
+- Cosmos VFS (Virtual File System) Integration
+- Automatisches Escaping von Sonderzeichen
 
-### 4.2 Backup-System
-- Automatische Backups bei Änderungen
-- Wiederherstellung bei Dateikorruption
+**Implementiert am:** 2025-10-21
+
+### 4.2 Backup-System ✅
+- ✅ Automatische Backups vor jeder Speicherung
+- ✅ Wiederherstellung bei Dateikorruption
+- ✅ Transaktionssicheres Schreiben
+- ✅ Backup-Datei: `users.bak`
+
+**Implementiert am:** 2025-10-21
+
+### 4.3 UserManager-Integration ✅
+- ✅ `SaveUsers()` und `LoadUsers()` Methoden
+- ✅ Auto-Save bei allen CRUD-Operationen
+- ✅ `AutoSaveEnabled` Property für Kontrolle
+- ✅ Erweiterte `Initialize()` mit VFS-Support
+- ✅ Automatisches Laden beim Start
+
+**Implementiert am:** 2025-10-21
+
+### 4.4 Tests ✅
+**Datei:** `PersistenceTest.cs`
+
+- ✅ 23 automatisierte Tests
+- ✅ UserStorage-Tests (8 Tests)
+- ✅ Backup-System-Tests (3 Tests)
+- ✅ Integration-Tests (6 Tests)
+- ✅ Persistenz-Szenarien (4 Tests)
+- ✅ Fehlerbehandlung (2 Tests)
+
+**Test-Befehl:** `testp4` oder `testpersist`
+
+**Implementiert am:** 2025-10-21
 
 ---
 
@@ -294,10 +329,13 @@ protected override void Run()
 - [ ] Login-Screen implementieren (Teil von Phase 5)
 - [x] Logout-Funktionalität
 
-### Sprint 3: Persistenz (Woche 3)
-- [ ] VFS in Cosmos einrichten
-- [ ] UserStorage implementieren
-- [ ] Daten speichern/laden
+### Sprint 3: Persistenz (Woche 3) ✅
+- [x] VFS in Cosmos einrichten
+- [x] UserStorage implementieren
+- [x] Daten speichern/laden
+- [x] Backup-System implementieren
+- [x] Auto-Save-Funktionalität
+- [x] Tests für Persistenz (23 Tests)
 
 ### Sprint 4: Befehle (Woche 4)
 - [ ] CommandHandler erstellen

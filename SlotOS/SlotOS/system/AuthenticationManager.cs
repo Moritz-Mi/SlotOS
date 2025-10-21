@@ -90,7 +90,8 @@ namespace SlotOS.System
             {
                 int remainingSeconds = (int)(_lockoutUntil - DateTime.Now).TotalSeconds;
                 throw new InvalidOperationException(
-                    $"Zu viele fehlgeschlagene Login-Versuche. Bitte warten Sie {remainingSeconds} Sekunden.");
+                    $"Zu viele fehlgeschlagene Login-Versuche. Bitte warten Sie {remainingSeconds} Sekunden."
+                );
             }
 
             // Eingaben validieren
@@ -117,7 +118,7 @@ namespace SlotOS.System
 
             // Passwort überprüfen
             bool passwordCorrect = PasswordHasher.Verify(password, user.PasswordHash);
-            
+
             if (!passwordCorrect)
             {
                 _failedLoginAttempts++;
@@ -130,7 +131,7 @@ namespace SlotOS.System
             CurrentUser.UpdateLastLogin();
             LastActivity = DateTime.Now;
             _failedLoginAttempts = 0; // Fehlversuche zurücksetzen
-            
+
             return true;
         }
 
@@ -157,7 +158,9 @@ namespace SlotOS.System
 
             if (!CurrentUser.IsAdmin())
             {
-                throw new UnauthorizedAccessException("Dieser Befehl erfordert Administrator-Rechte.");
+                throw new UnauthorizedAccessException(
+                    "Dieser Befehl erfordert Administrator-Rechte."
+                );
             }
 
             return true;
@@ -291,10 +294,10 @@ namespace SlotOS.System
             TimeSpan loginDuration = DateTime.Now - CurrentUser.LastLogin;
             TimeSpan inactiveTime = DateTime.Now - LastActivity;
 
-            return $"Benutzer: {CurrentUser.Username}\n" +
-                   $"Rolle: {CurrentUser.Role}\n" +
-                   $"Angemeldet seit: {loginDuration.TotalMinutes:F1} Minuten\n" +
-                   $"Letzte Aktivität: vor {inactiveTime.TotalSeconds:F0} Sekunden";
+            return $"Benutzer: {CurrentUser.Username}\n"
+                + $"Rolle: {CurrentUser.Role}\n"
+                + $"Angemeldet seit: {loginDuration.TotalMinutes:F1} Minuten\n"
+                + $"Letzte Aktivität: vor {inactiveTime.TotalSeconds:F0} Sekunden";
         }
 
         /// <summary>
