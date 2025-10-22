@@ -153,6 +153,7 @@ namespace SlotOS.System
 
                 if (authManager.Login(username, password))
                 {
+                    AuditLogger.Instance.LogLogin(username, true);
                     ConsoleHelper.WriteSuccess($"Willkommen, {authManager.CurrentUser.Username}!");
                     ConsoleHelper.WriteInfo($"Rolle: {ConsoleHelper.FormatRole(authManager.CurrentUser.Role)}");
                     // Cosmos OS compatible: simple concatenation
@@ -173,6 +174,7 @@ namespace SlotOS.System
                 }
                 else
                 {
+                    AuditLogger.Instance.LogLogin(username, false);
                     int remaining = authManager.GetRemainingLoginAttempts();
                     ConsoleHelper.WriteError($"Login fehlgeschlagen! Verbleibende Versuche: {remaining}");
 
@@ -194,13 +196,14 @@ namespace SlotOS.System
         {
             if (!authManager.IsAuthenticated)
             {
-                ConsoleHelper.WriteWarning("Kein Benutzer angemeldet");
+                ConsoleHelper.WriteWarning("Sie sind nicht angemeldet");
                 return;
             }
 
-            var username = authManager.CurrentUser.Username;
+            string username = authManager.CurrentUser.Username;
+            AuditLogger.Instance.LogLogout(username);
+            ConsoleHelper.WriteInfo($"Benutzer '{username}' wurde abgemeldet");
             authManager.Logout();
-            ConsoleHelper.WriteSuccess($"Benutzer '{username}' erfolgreich abgemeldet");
         }
 
         /// <summary>
@@ -210,7 +213,7 @@ namespace SlotOS.System
         {
             if (!authManager.IsAuthenticated)
             {
-                ConsoleHelper.WriteWarning("Kein Benutzer angemeldet");
+                ConsoleHelper.WriteWarning("Sie sind nicht angemeldet");
                 return;
             }
 
@@ -350,7 +353,9 @@ namespace SlotOS.System
                 return;
             }
 
-            if (userManager.ResetPassword(username, newPassword))
+            bool success = userManager.ResetPassword(username, newPassword);
+            AuditLogger.Instance.LogPasswordChange(authManager.CurrentUser.Username, username, success);
+            if (success)
             {
                 ConsoleHelper.WriteSuccess($"Passwort für '{username}' erfolgreich zurückgesetzt");
             }
@@ -389,7 +394,9 @@ namespace SlotOS.System
                 }
             }
 
-            if (userManager.CreateUser(username, password, role))
+            bool success = userManager.CreateUser(username, password, role);
+            AuditLogger.Instance.LogUserAction(authManager.CurrentUser.Username, "USER_CREATE", username, success);
+            if (success)
             {
                 ConsoleHelper.WriteSuccess($"Benutzer '{username}' erfolgreich erstellt");
                 ConsoleHelper.WriteInfo($"Rolle: {ConsoleHelper.FormatRole(role)}");
@@ -436,7 +443,9 @@ namespace SlotOS.System
                 return;
             }
 
-            if (userManager.DeleteUser(username))
+            bool success = userManager.DeleteUser(username);
+            AuditLogger.Instance.LogUserAction(authManager.CurrentUser.Username, "USER_DELETE", username, success);
+            if (success)
             {
                 ConsoleHelper.WriteSuccess($"Benutzer '{username}' erfolgreich gelöscht");
             }
