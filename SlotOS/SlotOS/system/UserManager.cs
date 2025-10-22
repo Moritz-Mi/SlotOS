@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SlotOS.System
 {
@@ -91,6 +90,16 @@ namespace SlotOS.System
                 CreateDefaultAdmin();
                 Console.WriteLine("[UserManager] Standard-Admin erstellt (admin/admin)");
             }
+        }
+
+        /// <summary>
+        /// Setzt den UserManager zurück (nur für Tests)
+        /// Löscht alle Benutzer und erstellt den Standard-Admin neu
+        /// </summary>
+        public void Reset()
+        {
+            _users.Clear();
+            CreateDefaultAdmin();
         }
 
         /// <summary>
@@ -212,8 +221,16 @@ namespace SlotOS.System
                 return null;
             }
 
-            return _users.FirstOrDefault(u => 
-                u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+            // Cosmos OS compatible: manual loop instead of LINQ
+            string lowerUsername = username.ToLower();
+            foreach (var user in _users)
+            {
+                if (user.Username.ToLower() == lowerUsername)
+                {
+                    return user;
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -231,7 +248,16 @@ namespace SlotOS.System
         /// </summary>
         public List<User> GetActiveUsers()
         {
-            return _users.Where(u => u.IsActive).ToList();
+            // Cosmos OS compatible: manual filtering
+            var activeUsers = new List<User>();
+            foreach (var user in _users)
+            {
+                if (user.IsActive)
+                {
+                    activeUsers.Add(user);
+                }
+            }
+            return activeUsers;
         }
 
         /// <summary>
@@ -369,8 +395,15 @@ namespace SlotOS.System
                 return false;
             }
 
-            // Zähle aktive Admins
-            int adminCount = _users.Count(u => u.Role == UserRole.Admin && u.IsActive);
+            // Zähle aktive Admins (Cosmos OS compatible)
+            int adminCount = 0;
+            foreach (var u in _users)
+            {
+                if (u.Role == UserRole.Admin && u.IsActive)
+                {
+                    adminCount++;
+                }
+            }
             return adminCount <= 1;
         }
 
@@ -379,7 +412,16 @@ namespace SlotOS.System
         /// </summary>
         public int GetAdminCount()
         {
-            return _users.Count(u => u.Role == UserRole.Admin && u.IsActive);
+            // Cosmos OS compatible: manual counting
+            int count = 0;
+            foreach (var user in _users)
+            {
+                if (user.Role == UserRole.Admin && user.IsActive)
+                {
+                    count++;
+                }
+            }
+            return count;
         }
 
         /// <summary>
@@ -408,11 +450,20 @@ namespace SlotOS.System
         /// </summary>
         public string GetStatistics()
         {
+            // Cosmos OS compatible: manual counting
             int totalUsers = _users.Count;
-            int activeUsers = _users.Count(u => u.IsActive);
-            int admins = _users.Count(u => u.Role == UserRole.Admin);
-            int standardUsers = _users.Count(u => u.Role == UserRole.Standard);
-            int guests = _users.Count(u => u.Role == UserRole.Guest);
+            int activeUsers = 0;
+            int admins = 0;
+            int standardUsers = 0;
+            int guests = 0;
+            
+            foreach (var user in _users)
+            {
+                if (user.IsActive) activeUsers++;
+                if (user.Role == UserRole.Admin) admins++;
+                else if (user.Role == UserRole.Standard) standardUsers++;
+                else if (user.Role == UserRole.Guest) guests++;
+            }
 
             return $"Benutzer-Statistiken:\n" +
                    $"  Gesamt: {totalUsers}\n" +
