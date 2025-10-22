@@ -1,0 +1,249 @@
+specification {
+  element person
+  element system
+  element container
+  element component
+  element database
+}
+
+model {
+  // Externe Akteure
+  admin = person 'System Administrator' {
+    description 'Verwaltet Benutzer und System-Konfiguration'
+    style {
+      icon tech:user
+    }
+  }
+
+  user = person 'Standard User' {
+    description 'Normaler Systembenutzer mit eingeschränkten Rechten'
+    style {
+      icon tech:user
+    }
+  }
+
+  guest = person 'Guest User' {
+    description 'Gast mit minimalen Rechten'
+    style {
+      icon tech:user
+    }
+  }
+
+  // Hauptsystem
+  slotOS = system 'SlotOS' {
+    description 'Cosmos OS basiertes Betriebssystem mit User Management'
+
+    // Kernel Container
+    kernel = container 'Kernel' {
+      description 'Haupteinstiegspunkt des Systems, verwaltet Systemstart und Kommandoschleife'
+      technology 'Cosmos OS Kernel'
+      style {
+        icon tech:terminal
+        shape mobile
+      }
+    }
+
+    // User Management Subsystem
+    userManagement = container 'User Management Subsystem' {
+      description 'Verwaltet alle Benutzer, Authentifizierung und Berechtigungen'
+      technology 'C# / In-Memory'
+
+      // Core Components
+      userManager = component 'UserManager' {
+        description 'Singleton für CRUD-Operationen auf Benutzern, speichert Benutzer in-memory'
+        technology 'C# Singleton'
+        style {
+          icon tech:csharp
+        }
+      }
+
+      authManager = component 'AuthenticationManager' {
+        description 'Verwaltet Login/Logout, Session-Management und Login-Attempts'
+        technology 'C# Class'
+        style {
+          icon tech:lock
+        }
+      }
+
+      passwordHasher = component 'PasswordHasher' {
+        description 'Hash-Algorithmus für sichere Passwort-Speicherung (Salt + 1000 Iterationen)'
+        technology 'C# Static'
+        style {
+          icon tech:shield
+        }
+      }
+
+      permissionChecker = component 'PermissionChecker' {
+        description 'Prüft Berechtigungen basierend auf UserRole'
+        technology 'C# Static'
+        style {
+          icon tech:shield
+        }
+      }
+
+      user_model = component 'User Model' {
+        description 'Datenmodell für Benutzer mit Properties und Methoden'
+        technology 'C# Class'
+        style {
+          icon tech:database
+        }
+      }
+
+      userRole = component 'UserRole Enum' {
+        description 'Enum für Benutzerrollen: Admin, Standard, Guest'
+        technology 'C# Enum'
+      }
+
+      // Beziehungen innerhalb User Management
+      userManager -> user_model 'erstellt und verwaltet'
+      userManager -> passwordHasher 'nutzt für Password-Hashing'
+      authManager -> userManager 'holt Benutzerliste'
+      authManager -> user_model 'validiert Credentials'
+      authManager -> passwordHasher 'verifiziert Passwörter'
+      permissionChecker -> userRole 'prüft Rollen'
+      permissionChecker -> user_model 'prüft Benutzer'
+      user_model -> userRole 'hat Rolle'
+      user_model -> passwordHasher 'verifiziert Passwort'
+    }
+
+    // Command Interface Subsystem
+    commandInterface = container 'Command Interface' {
+      description 'CLI für Benutzerinteraktion und Befehls-Verarbeitung'
+      technology 'C# / Console'
+
+      commandHandler = component 'CommandHandler' {
+        description 'Verarbeitet Benutzerbefehle und koordiniert Aktionen'
+        technology 'C# Class'
+        style {
+          icon tech:terminal
+        }
+      }
+
+      consoleHelper = component 'ConsoleHelper' {
+        description 'UI-Hilfsfunktionen für farbige Ausgaben, Tabellen, Passwort-Eingabe'
+        technology 'C# Static'
+        style {
+          icon tech:palette
+        }
+      }
+
+      // Beziehungen
+      commandHandler -> consoleHelper 'nutzt für UI-Ausgaben'
+    }
+
+    // Security & Audit Subsystem
+    auditSystem = container 'Audit & Security' {
+      description 'Protokolliert sicherheitsrelevante Aktionen'
+      technology 'C# / In-Memory'
+
+      auditLogger = component 'AuditLogger' {
+        description 'Singleton für Audit-Logging, speichert max. 100 Einträge in-memory'
+        technology 'C# Singleton'
+        style {
+          icon tech:log
+        }
+      }
+
+      auditEntry = component 'AuditEntry Model' {
+        description 'Datenmodell für Audit-Einträge'
+        technology 'C# Class'
+        style {
+          icon tech:database
+        }
+      }
+
+      // Beziehungen
+      auditLogger -> auditEntry 'erstellt und speichert'
+    }
+
+    // Container-Beziehungen
+    kernel -> commandInterface 'initialisiert und nutzt'
+    kernel -> userManagement 'initialisiert'
+    kernel -> auditSystem 'nutzt für Logging'
+    
+    commandInterface -> userManagement 'verwaltet Benutzer über'
+    commandInterface -> auditSystem 'loggt Aktionen'
+  }
+
+  // Externe Beziehungen
+  admin -> kernel 'verwendet'
+  user -> kernel 'verwendet'
+  guest -> kernel 'verwendet'
+}
+
+views {
+  // Systemkontext
+  view index {
+    title 'SlotOS - Systemkontext'
+    description 'Überblick über SlotOS und seine Benutzer'
+    include *
+    style admin {
+      color green
+    }
+    style user {
+      color blue
+    }
+    style guest {
+      color amber
+    }
+  }
+
+  // SlotOS Internal Architecture
+  view of slotOS {
+    title 'SlotOS - Interne Architektur'
+    description 'Hauptcontainer und deren Verantwortlichkeiten'
+    include *
+    style admin {
+      color muted
+    }
+    style user {
+      color muted
+    }
+    style guest {
+      color muted
+    }
+  }
+
+  // User Management Detail
+  view of userManagement {
+    title 'User Management Subsystem'
+    description 'Detaillierte Komponenten der Benutzerverwaltung'
+    include *
+  }
+
+  // Command Interface Detail
+  view of commandInterface {
+    title 'Command Interface Subsystem'
+    description 'CLI-Komponenten für Benutzerinteraktion'
+    include *
+  }
+
+  // Audit System Detail
+  view of auditSystem {
+    title 'Audit & Security Subsystem'
+    description 'Sicherheits- und Logging-Komponenten'
+    include *
+  }
+
+  // Complete System View
+  view {
+    title 'SlotOS - Komplette Architektur'
+    description 'Alle Komponenten und ihre Beziehungen'
+    include 
+      admin,
+      user,
+      guest,
+      kernel,
+      userManager,
+      authManager,
+      passwordHasher,
+      permissionChecker,
+      user_model,
+      userRole,
+      commandHandler,
+      consoleHelper,
+      auditLogger,
+      auditEntry,
+      ->
+  }
+}

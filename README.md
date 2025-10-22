@@ -351,6 +351,23 @@ userstats                                - Benutzerstatistiken anzeigen
 - ✅ Vollständige Dokumentation (PHASE7_IMPLEMENTATION.md)
 - ✅ System ist produktionsreif für In-Memory-Betrieb
 
+## 📊 Architektur-Dokumentation
+
+Umfassende Architektur-Dokumentation mit LikeC4-Diagrammen verfügbar im **[docs/](./docs/)** Verzeichnis:
+
+### 📖 Übersichten
+- **[docs/ARCHITECTURE_OVERVIEW.md](./docs/ARCHITECTURE_OVERVIEW.md)** - Umfassende Architektur-Übersicht
+- **[docs/README.md](./docs/README.md)** - Anleitung zur Verwendung der Diagramme
+
+### 🎨 LikeC4-Diagramme
+- **[docs/architecture.c4](./docs/architecture.c4)** - System- und Komponenten-Architektur (6 Views)
+- **[docs/flows.c4](./docs/flows.c4)** - Prozess- und Datenflüsse (7 Views)
+- **[docs/phases.c4](./docs/phases.c4)** - Entwicklungsphasen und Tests (11 Views)
+
+**📊 Total: 24 verschiedene Architektur-Views!**
+
+Öffne die `.c4`-Dateien im [LikeC4 Playground](https://playground.likec4.dev/w/blank/) für interaktive Diagramme.
+
 ### Version 0.6.0 (2025-10-22)
 - ✅ Phase 6 komplett implementiert
 - ✅ PermissionChecker mit umfassendem Berechtigungssystem

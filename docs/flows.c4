@@ -1,0 +1,263 @@
+specification {
+  element person
+  element system
+  element process
+  element datastore
+}
+
+model {
+  // Akteure
+  admin = person 'Administrator'
+  user = person 'User'
+
+  // SlotOS System mit Flow-Komponenten
+  slotOS = system 'SlotOS' {
+    
+    // Login Flow
+    loginFlow = process 'Login Flow' {
+      description '
+        1. Benutzer startet login Befehl
+        2. CommandHandler zeigt Login-Screen
+        3. Benutzername und Passwort eingeben
+        4. AuthenticationManager validiert
+        5. Bei Erfolg: Session erstellt, Audit-Log
+        6. Bei Fehler: Login-Attempts erhöht
+      '
+      
+      loginCmd = process 'Login Command' {
+        description 'Startet Login-Prozess, zeigt Login-Screen'
+      }
+      
+      validateCreds = process 'Validate Credentials' {
+        description 'Prüft Benutzername/Passwort gegen UserManager'
+      }
+      
+      createSession = process 'Create Session' {
+        description 'Erstellt neue Session mit Timestamp'
+      }
+      
+      logAttempt = process 'Log Attempt' {
+        description 'Protokolliert Login-Versuch im AuditLogger'
+      }
+      
+      checkAttempts = process 'Check Login Attempts' {
+        description 'Prüft ob max. 3 Versuche überschritten, sperrt Account für 30s'
+      }
+
+      loginCmd -> validateCreds 'validiert'
+      validateCreds -> createSession 'bei Erfolg'
+      validateCreds -> checkAttempts 'bei Fehler'
+      validateCreds -> logAttempt 'protokolliert'
+    }
+
+    // User Management Flow
+    userMgmtFlow = process 'User Management Flow' {
+      description 'CRUD-Operationen für Benutzer mit Berechtigungsprüfung'
+      
+      checkPerm = process 'Check Permission' {
+        description 'PermissionChecker prüft ob Admin-Rechte vorhanden'
+      }
+      
+      createUser = process 'Create User' {
+        description 'UserManager erstellt neuen Benutzer mit gehashtem Passwort'
+      }
+      
+      updateUser = process 'Update User' {
+        description 'UserManager aktualisiert Benutzer-Properties'
+      }
+      
+      deleteUser = process 'Delete User' {
+        description 'UserManager löscht Benutzer (prüft: nicht letzter Admin)'
+      }
+      
+      logAction = process 'Log User Action' {
+        description 'AuditLogger protokolliert User-Management-Aktion'
+      }
+
+      checkPerm -> createUser 'erlaubt Erstellung'
+      checkPerm -> updateUser 'erlaubt Update'
+      checkPerm -> deleteUser 'erlaubt Löschung'
+      createUser -> logAction 'protokolliert'
+      updateUser -> logAction 'protokolliert'
+      deleteUser -> logAction 'protokolliert'
+    }
+
+    // Session Management Flow
+    sessionFlow = process 'Session Management Flow' {
+      description 'Verwaltung von Benutzer-Sessions mit Timeout'
+      
+      checkTimeout = process 'Check Session Timeout' {
+        description 'Prüft ob 30 Minuten Inaktivität vergangen'
+      }
+      
+      updateActivity = process 'Update Last Activity' {
+        description 'Aktualisiert LastActivity-Timestamp bei Befehl'
+      }
+      
+      autoLogout = process 'Auto Logout' {
+        description 'Meldet Benutzer bei Timeout automatisch ab'
+      }
+      
+      logTimeout = process 'Log Timeout' {
+        description 'AuditLogger protokolliert Session-Timeout'
+      }
+
+      checkTimeout -> autoLogout 'bei Timeout'
+      autoLogout -> logTimeout 'protokolliert'
+      updateActivity -> checkTimeout 'prüft bei jedem Command'
+    }
+
+    // Password Management Flow
+    passwordFlow = process 'Password Management Flow' {
+      description 'Passwort-Änderung und Reset mit Hashing'
+      
+      validateOldPwd = process 'Validate Old Password' {
+        description 'Prüft altes Passwort (nur bei ChangePassword)'
+      }
+      
+      validateNewPwd = process 'Validate New Password' {
+        description 'Prüft ob neues Passwort mind. 4 Zeichen hat'
+      }
+      
+      hashPassword = process 'Hash Password' {
+        description 'PasswordHasher erstellt Salt und Hash (1000 Iterationen)'
+      }
+      
+      updateUser_pwd = process 'Update User Password' {
+        description 'UserManager speichert neues PasswordHash und Salt'
+      }
+      
+      logPwdChange = process 'Log Password Change' {
+        description 'AuditLogger protokolliert Passwort-Änderung'
+      }
+
+      validateOldPwd -> validateNewPwd 'bei Erfolg'
+      validateNewPwd -> hashPassword 'hasht neues Passwort'
+      hashPassword -> updateUser_pwd 'speichert'
+      updateUser_pwd -> logPwdChange 'protokolliert'
+    }
+
+    // Audit Logging Flow
+    auditFlow = process 'Audit Logging Flow' {
+      description 'Zentrale Protokollierung aller sicherheitsrelevanten Events'
+      
+      createEntry = process 'Create Audit Entry' {
+        description 'Erstellt AuditEntry mit Timestamp, User, Action, Details'
+      }
+      
+      storeEntry = process 'Store Entry' {
+        description 'Speichert Entry in List (max 100, älteste werden entfernt)'
+      }
+      
+      viewLogs = process 'View Audit Logs' {
+        description 'Admin kann Logs mit auditlog-Befehl einsehen'
+      }
+
+      createEntry -> storeEntry 'speichert'
+      storeEntry -> viewLogs 'ermöglicht Anzeige'
+    }
+
+    // Data Storage
+    userStore = datastore 'User Storage (In-Memory)' {
+      description 'List<User> im UserManager, nicht persistent'
+      technology 'In-Memory'
+      style {
+        icon tech:database
+      }
+    }
+
+    auditStore = datastore 'Audit Storage (In-Memory)' {
+      description 'List<AuditEntry> im AuditLogger, max 100 Einträge'
+      technology 'In-Memory'
+      style {
+        icon tech:database
+      }
+    }
+
+    // Flow zu Storage Beziehungen
+    loginFlow -> userStore 'liest aus'
+    userMgmtFlow -> userStore 'liest/schreibt'
+    passwordFlow -> userStore 'aktualisiert'
+    
+    auditFlow -> auditStore 'schreibt in'
+    loginFlow -> auditFlow 'sendet Events'
+    userMgmtFlow -> auditFlow 'sendet Events'
+    sessionFlow -> auditFlow 'sendet Events'
+    passwordFlow -> auditFlow 'sendet Events'
+  }
+
+  // Benutzer-Interaktionen
+  admin -> loginFlow 'startet Login'
+  user -> loginFlow 'startet Login'
+  admin -> userMgmtFlow 'verwaltet Benutzer'
+  admin -> passwordFlow 'ändert Passwörter'
+  user -> passwordFlow 'ändert eigenes Passwort'
+  admin -> auditFlow 'sieht Logs ein'
+}
+
+views {
+  // Flow Overview
+  view index {
+    title 'SlotOS - System Flows Übersicht'
+    description 'Hauptprozesse und Datenflüsse'
+    include *
+    style userStore {
+      color green
+    }
+    style auditStore {
+      color blue
+    }
+  }
+
+  // Login Flow Detail
+  view of loginFlow {
+    title 'Login Flow - Detailliert'
+    description 'Schritte des Login-Prozesses'
+    include *
+  }
+
+  // User Management Flow Detail
+  view of userMgmtFlow {
+    title 'User Management Flow - Detailliert'
+    description 'CRUD-Operationen mit Berechtigungsprüfung'
+    include *
+  }
+
+  // Session Management Flow Detail
+  view of sessionFlow {
+    title 'Session Management Flow - Detailliert'
+    description 'Session-Timeout und Auto-Logout'
+    include *
+  }
+
+  // Password Management Flow Detail
+  view of passwordFlow {
+    title 'Password Management Flow - Detailliert'
+    description 'Passwort-Änderung mit Hashing'
+    include *
+  }
+
+  // Audit Flow Detail
+  view of auditFlow {
+    title 'Audit Logging Flow - Detailliert'
+    description 'Zentrale Event-Protokollierung'
+    include *
+  }
+
+  // Complete Data Flow
+  view {
+    title 'SlotOS - Kompletter Datenfluss'
+    description 'Alle Prozesse und Speicher mit Beziehungen'
+    include
+      admin,
+      user,
+      loginFlow,
+      userMgmtFlow,
+      sessionFlow,
+      passwordFlow,
+      auditFlow,
+      userStore,
+      auditStore,
+      ->
+  }
+}

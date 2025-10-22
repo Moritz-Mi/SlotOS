@@ -1,0 +1,319 @@
+specification {
+  element phase
+  element module
+  element test
+  element documentation
+}
+
+model {
+  // Phase 1-7 Development Structure
+  development = phase 'SlotOS Development Phases' {
+    
+    phase1 = phase 'Phase 1 - Basic Data Structures' {
+      description 'Grundlegende Datenmodelle'
+      
+      user_class = module 'User.cs' {
+        description 'User-Klasse mit Properties und Methoden'
+      }
+      
+      userRole_enum = module 'UserRole.cs' {
+        description 'Enum: Admin, Standard, Guest'
+      }
+      
+      phase1_test = test 'UserSystemTest (Part 1)' {
+        description '7 Tests für User-Klasse'
+      }
+      
+      user_class -> phase1_test 'wird getestet'
+      userRole_enum -> phase1_test 'wird getestet'
+    }
+
+    phase2 = phase 'Phase 2 - Authentication System' {
+      description 'Login, Logout, Session Management'
+      
+      passwordHasher_mod = module 'PasswordHasher.cs' {
+        description 'Salt-basiertes Hashing mit 1000 Iterationen'
+      }
+      
+      authManager_mod = module 'AuthenticationManager.cs' {
+        description 'Login/Logout, Session-Tracking, Login-Attempts'
+      }
+      
+      phase2_test = test 'UserSystemTest (Part 2)' {
+        description '8 Tests für Authentication'
+      }
+      
+      passwordHasher_mod -> phase2_test 'wird getestet'
+      authManager_mod -> phase2_test 'wird getestet'
+      authManager_mod -> passwordHasher_mod 'nutzt'
+    }
+
+    phase3 = phase 'Phase 3 - User Management' {
+      description 'CRUD-Operationen für Benutzer'
+      
+      userManager_mod = module 'UserManager.cs' {
+        description 'Singleton mit CreateUser, DeleteUser, UpdateUser, etc.'
+      }
+      
+      phase3_test = test 'UserSystemTest (Part 3)' {
+        description '8 Tests für User Management'
+      }
+      
+      userManager_mod -> phase3_test 'wird getestet'
+      userManager_mod -> passwordHasher_mod 'nutzt'
+    }
+
+    phase4 = phase 'Phase 4 - Data Persistence (Deaktiviert)' {
+      description 'VFS-Integration (deaktiviert wegen Cosmos OS Limitierungen)'
+      
+      userStorage_mod = module 'UserStorage.cs (unused)' {
+        description 'VFS-basierte Persistenz (nicht verwendet)'
+        style {
+          color muted
+        }
+      }
+      
+      phase4_test = test 'InMemoryTest' {
+        description '18 Tests für In-Memory-Modus (aktiv)'
+      }
+      
+      phase4_doc = documentation 'IN_MEMORY_MODE.md' {
+        description 'Dokumentation der Entscheidung für In-Memory'
+      }
+    }
+
+    phase5 = phase 'Phase 5 - Command Interface' {
+      description 'CLI für Benutzerverwaltung'
+      
+      consoleHelper_mod = module 'ConsoleHelper.cs' {
+        description 'UI-Hilfsfunktionen, farbige Ausgaben, Tabellen'
+      }
+      
+      commandHandler_mod = module 'CommandHandler.cs' {
+        description 'Befehls-Verarbeitung für alle User-Commands'
+      }
+      
+      phase5_test = test 'CommandHandlerTest' {
+        description '30 Tests für Command Interface'
+      }
+      
+      commandHandler_mod -> consoleHelper_mod 'nutzt'
+      commandHandler_mod -> userManager_mod 'nutzt'
+      commandHandler_mod -> authManager_mod 'nutzt'
+      commandHandler_mod -> phase5_test 'wird getestet'
+      consoleHelper_mod -> phase5_test 'wird getestet'
+    }
+
+    phase6 = phase 'Phase 6 - Permission System' {
+      description 'Rollenbasierte Zugriffskontrolle'
+      
+      permissionChecker_mod = module 'PermissionChecker.cs' {
+        description 'Statische Klasse für Berechtigungsprüfungen'
+      }
+      
+      phase6_test = test 'PermissionCheckerTest' {
+        description '42 Tests für Permission System'
+      }
+      
+      permissionChecker_mod -> phase6_test 'wird getestet'
+      permissionChecker_mod -> userRole_enum 'prüft'
+    }
+
+    phase7 = phase 'Phase 7 - Kernel Integration' {
+      description 'Integration in Cosmos OS Kernel'
+      
+      kernel_mod = module 'Kernel.cs' {
+        description 'Haupteinstiegspunkt, Systemstart, Command Loop'
+      }
+      
+      auditLogger_mod = module 'AuditLogger.cs' {
+        description 'Singleton für Audit-Logging (max 100 Einträge)'
+      }
+      
+      phase7_doc1 = documentation 'PHASE7_IMPLEMENTATION.md' {
+        description 'Vollständige Implementierungs-Dokumentation'
+      }
+      
+      phase7_doc2 = documentation 'PHASE7_SUMMARY.md' {
+        description 'Zusammenfassung Phase 7'
+      }
+      
+      phase7_bugfix = documentation 'PHASE7_BUGFIX.md' {
+        description 'GPF 0x0D Bugfix-Dokumentation'
+      }
+      
+      kernel_mod -> commandHandler_mod 'nutzt'
+      kernel_mod -> userManager_mod 'initialisiert'
+      kernel_mod -> authManager_mod 'initialisiert'
+      kernel_mod -> auditLogger_mod 'nutzt'
+      commandHandler_mod -> auditLogger_mod 'loggt in'
+    }
+
+    // Phase Dependencies
+    phase2 -> phase1 'baut auf'
+    phase3 -> phase2 'baut auf'
+    phase4 -> phase3 'baut auf'
+    phase5 -> phase3 'baut auf'
+    phase6 -> phase3 'baut auf'
+    phase7 -> phase5 'baut auf'
+    phase7 -> phase6 'baut auf'
+  }
+
+  // Testing Infrastructure
+  testingSystem = phase 'Testing Infrastructure' {
+    description 'Umfassendes Test-Framework'
+    
+    userSystemTest = test 'UserSystemTest.cs' {
+      description 'Phase 1-3: 23 Tests für User, Auth, UserManager'
+    }
+    
+    inMemoryTest = test 'InMemoryTest.cs' {
+      description 'Phase 4: 18 Tests für In-Memory-Modus'
+    }
+    
+    commandHandlerTest = test 'CommandHandlerTest.cs' {
+      description 'Phase 5: 30 Tests für Command Interface'
+    }
+    
+    permissionCheckerTest = test 'PermissionCheckerTest.cs' {
+      description 'Phase 6: 42 Tests für Permission System'
+    }
+    
+    testRunner = module 'Test Commands' {
+      description 'Kernel-Commands: test, testp4, testp5, testp6'
+    }
+    
+    testRunner -> userSystemTest 'führt aus'
+    testRunner -> inMemoryTest 'führt aus'
+    testRunner -> commandHandlerTest 'führt aus'
+    testRunner -> permissionCheckerTest 'führt aus'
+  }
+
+  // Documentation Structure
+  docSystem = phase 'Documentation System' {
+    description 'Vollständige Projekt-Dokumentation'
+    
+    readme = documentation 'README.md' {
+      description 'Hauptdokumentation, Feature-Übersicht'
+    }
+    
+    inMemoryDoc = documentation 'IN_MEMORY_MODE.md' {
+      description 'Technische Dokumentation In-Memory-Entscheidung'
+    }
+    
+    testingDoc = documentation 'TESTING.md' {
+      description 'Test-Ergebnisse und Bugfixing-Historie'
+    }
+    
+    phase5Doc = documentation 'PHASE5_SUMMARY.md' {
+      description 'Phase 5 Zusammenfassung'
+    }
+    
+    phase6Doc = documentation 'PHASE6_SUMMARY.md' {
+      description 'Phase 6 Zusammenfassung'
+    }
+    
+    phase7Impl = documentation 'PHASE7_IMPLEMENTATION.md' {
+      description 'Phase 7 Implementation Details'
+    }
+    
+    phase7Sum = documentation 'PHASE7_SUMMARY.md' {
+      description 'Phase 7 Zusammenfassung'
+    }
+    
+    phase7Bug = documentation 'PHASE7_BUGFIX.md' {
+      description 'Kritische Bugfixes für Cosmos OS'
+    }
+    
+    architectureC4 = documentation 'docs/architecture.c4' {
+      description 'LikeC4 Architektur-Diagramme'
+    }
+    
+    flowsC4 = documentation 'docs/flows.c4' {
+      description 'LikeC4 Flow-Diagramme'
+    }
+    
+    phasesC4 = documentation 'docs/phases.c4' {
+      description 'LikeC4 Phasen-Diagramme'
+    }
+  }
+
+  development -> testingSystem 'wird getestet durch'
+  development -> docSystem 'wird dokumentiert in'
+}
+
+views {
+  // Overview
+  view index {
+    title 'SlotOS - Entwicklungsphasen Übersicht'
+    description 'Struktur des Entwicklungsprozesses'
+    include *
+  }
+
+  // Phase Details
+  view of phase1 {
+    title 'Phase 1 - Basic Data Structures'
+    description 'Grundlegende Datenmodelle und Tests'
+    include *
+  }
+
+  view of phase2 {
+    title 'Phase 2 - Authentication System'
+    description 'Login, Logout, Session Management'
+    include *
+  }
+
+  view of phase3 {
+    title 'Phase 3 - User Management'
+    description 'CRUD-Operationen für Benutzer'
+    include *
+  }
+
+  view of phase4 {
+    title 'Phase 4 - Data Persistence (Deaktiviert)'
+    description 'In-Memory-Modus statt VFS'
+    include *
+  }
+
+  view of phase5 {
+    title 'Phase 5 - Command Interface'
+    description 'CLI für Benutzerverwaltung'
+    include *
+  }
+
+  view of phase6 {
+    title 'Phase 6 - Permission System'
+    description 'Rollenbasierte Zugriffskontrolle'
+    include *
+  }
+
+  view of phase7 {
+    title 'Phase 7 - Kernel Integration'
+    description 'Integration in Cosmos OS'
+    include *
+  }
+
+  // Testing System
+  view of testingSystem {
+    title 'Testing Infrastructure'
+    description 'Umfassendes Test-Framework mit 113 Tests'
+    include *
+  }
+
+  // Documentation System
+  view of docSystem {
+    title 'Documentation System'
+    description 'Vollständige Projekt-Dokumentation'
+    include *
+  }
+
+  // Complete Development View
+  view {
+    title 'SlotOS - Komplette Entwicklungsstruktur'
+    description 'Alle Phasen, Tests und Dokumentation'
+    include
+      phase1, phase2, phase3, phase4, phase5, phase6, phase7,
+      testingSystem, docSystem,
+      ->
+  }
+}
