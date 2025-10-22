@@ -75,10 +75,36 @@ SlotOS ist ein lernorientiertes OS-Projekt, das ein vollständiges Benutzerverwa
 - Testet: Initialize, Standard-Admin, CRUD, Neustart-Simulation, Performance
 - Befehl: `testp4` oder `testmemory`
 
+#### Phase 5: Kommandozeilen-Interface ✅
+- **ConsoleHelper**:
+  - Maskierte Passwort-Eingabe mit Sternchen
+  - Farbige Statusmeldungen (Erfolg, Fehler, Warnung, Info)
+  - Formatierte Tabellen und Header
+  - Bestätigungs-Dialoge
+  - Login-Screen-Funktion
+- **CommandHandler**:
+  - Vollständige Benutzerverwaltungs-Befehle
+  - Intelligentes Command-Parsing (mit Anführungszeichen-Support)
+  - Automatische Berechtigungsprüfung
+  - Interaktive Benutzerführung
+- **Befehle für alle Benutzer**:
+  - `login` - Benutzer anmelden
+  - `logout` - Benutzer abmelden
+  - `whoami` - Aktuelle Benutzerinformationen
+  - `passwd` - Eigenes Passwort ändern
+- **Admin-Befehle**:
+  - `useradd <user> <pass> [role]` - Benutzer erstellen
+  - `userdel <user>` - Benutzer löschen
+  - `usermod <user> <option> <wert>` - Benutzer bearbeiten
+  - `userlist` - Alle Benutzer anzeigen
+  - `passwd <user>` - Admin-Passwort-Reset
+  - `userstats` - Benutzerstatistiken
+- **Tests**: 30 automatisierte Tests in `CommandHandlerTest.cs`
+- **Befehl**: `testp5` oder `testcommands`
+
 ### 🚧 In Planung
-- **Phase 5**: Kommandozeilen-Interface (Login-Screen, Befehle)
 - **Phase 6**: Berechtigungssystem
-- **Phase 7**: Kernel-Integration
+- **Phase 7**: Vollständige Kernel-Integration mit Login-Flow
 - **Phase 8**: Testing & Validierung
 - **Phase 9**: Erweiterte Features (Optional)
 
@@ -107,13 +133,15 @@ dotnet build
 
 Im laufenden SlotOS:
 ```
-SlotOS> test       # Phase 1-3 Tests
-SlotOS> testp4     # Phase 4 Persistenz-Tests
+SlotOS> test       # Phase 1-3 Tests (23 Tests)
+SlotOS> testp4     # Phase 4 In-Memory Tests (18 Tests)
+SlotOS> testp5     # Phase 5 Command Handler Tests (30 Tests)
 ```
 
 Zeigt alle verfügbaren Befehle:
 ```
-SlotOS> help
+SlotOS> help       # System-Befehle
+SlotOS> userhelp   # Benutzerverwaltungs-Befehle
 ```
 
 ## 📁 Projektstruktur
@@ -129,11 +157,14 @@ SlotOS/
 │       ├── PasswordHasher.cs          # Passwort-Hashing
 │       ├── AuthenticationManager.cs   # Authentifizierung
 │       ├── UserManager.cs             # Benutzerverwaltung
-│       ├── UserStorage.cs             # Datenpersistenz
+│       ├── CommandHandler.cs          # Befehls-Verarbeitung (Phase 5)
+│       ├── ConsoleHelper.cs           # UI-Hilfsfunktionen (Phase 5)
 │       ├── UserSystemTest.cs          # Automatisierte Tests (Phase 1-3)
-│       └── PersistenceTest.cs         # Persistenz-Tests (Phase 4)
+│       ├── InMemoryTest.cs            # In-Memory-Tests (Phase 4)
+│       └── CommandHandlerTest.cs      # Command-Tests (Phase 5)
 ├── NUTZERVERWALTUNG_PLAN.md          # Detaillierter Implementierungsplan
 ├── TESTING.md                         # Test-Dokumentation
+├── IN_MEMORY_MODE.md                  # In-Memory-Modus Dokumentation
 └── README.md                          # Diese Datei
 ```
 
@@ -141,9 +172,9 @@ SlotOS/
 
 ### Automatische Tests
 
-SlotOS enthält eine umfassende Test-Suite für Phase 1-4:
+SlotOS enthält eine umfassende Test-Suite für Phase 1-5:
 
-- **46 automatisierte Tests** (23 für Phase 1-3, 23 für Phase 4)
+- **71 automatisierte Tests** (23 für Phase 1-3, 18 für Phase 4, 30 für Phase 5)
 - Tests für alle Kernfunktionen
 - Detaillierte Fehlerberichte
 
@@ -151,11 +182,9 @@ Siehe [TESTING.md](TESTING.md) für Details.
 
 ### Test-Kategorien
 
-1. **Phase 1 Tests**: User-Erstellung, Rollen, Passwort-Updates
-2. **PasswordHasher Tests**: Hashing, Verifikation, Salt, Kompatibilität
-3. **AuthenticationManager Tests**: Login, Logout, Rechte, Sperrung, Sessions
-4. **UserManager Tests**: CRUD-Operationen, Passwort-Verwaltung, Admin-Schutz, Statistiken
-5. **Persistenz Tests**: VFS, Save/Load, Backup-System, Auto-Save, Integration
+1. **Phase 1-3 Tests**: User-Erstellung, Rollen, Passwort-Updates, Hashing, Verifikation, Login, Logout, CRUD-Operationen
+2. **Phase 4 Tests**: In-Memory-Betrieb, Standard-Admin, Neustart-Simulation, Performance
+3. **Phase 5 Tests**: CommandHandler, Command-Parsing, Berechtigungen, Benutzerverwaltungs-Befehle, Passwort-Management, UserMod, ConsoleHelper
 
 ## 🔒 Sicherheit
 
@@ -180,14 +209,36 @@ Siehe [TESTING.md](TESTING.md) für Details.
 
 ## 🔧 Verfügbare Befehle
 
-Im laufenden SlotOS:
+### System-Befehle
 
 ```
-test       - Führt alle automatischen Tests (Phase 1-3) aus
-testp4     - Führt Persistenz-Tests (Phase 4) aus
-help       - Zeigt Befehlsliste an
-clear      - Löscht den Bildschirm
-exit       - Fährt das System herunter
+test          - Führt alle automatischen Tests (Phase 1-3) aus
+testp4        - Führt In-Memory-Tests (Phase 4) aus
+testp5        - Führt Command-Handler-Tests (Phase 5) aus
+help          - Zeigt System-Befehlsliste an
+userhelp      - Zeigt Benutzerverwaltungs-Befehle an
+clear         - Löscht den Bildschirm
+exit          - Fährt das System herunter
+```
+
+### Benutzerverwaltungs-Befehle
+
+**Für alle Benutzer:**
+```
+login         - Benutzer anmelden
+logout        - Benutzer abmelden
+whoami        - Zeigt aktuellen Benutzer an
+passwd        - Eigenes Passwort ändern
+```
+
+**Für Administratoren:**
+```
+useradd <username> <password> [role]    - Benutzer erstellen
+userdel <username>                       - Benutzer löschen
+usermod <username> <option> <wert>       - Benutzer bearbeiten
+userlist                                 - Alle Benutzer auflisten
+passwd <username>                        - Passwort für Benutzer zurücksetzen
+userstats                                - Benutzerstatistiken anzeigen
 ```
 
 ## 💻 Entwicklung
@@ -198,10 +249,11 @@ exit       - Fährt das System herunter
 - ✅ Phase 1: Datenstrukturen (100%)
 - ✅ Phase 2: Authentifizierung (100%)
 - ✅ Phase 3: Benutzerverwaltung (100%)
-- ✅ Phase 4: Datenpersistenz (100%)
+- ✅ Phase 4: Datenpersistenz / In-Memory-Modus (100%)
+- ✅ Phase 5: Kommandozeilen-Interface (100%)
 
 **In Arbeit:**
-- 🚧 Phase 5: Kommandozeilen-Interface (0%)
+- 🚧 Phase 6: Berechtigungssystem (0%)
 
 ### Code-Stil
 
@@ -212,9 +264,9 @@ exit       - Fährt das System herunter
 
 ### Nächste Schritte
 
-1. Login-Screen UI (Phase 5)
-2. Benutzerverwaltungs-Befehle (Phase 5)
-3. CommandHandler für Befehlsverarbeitung (Phase 5)
+1. PermissionChecker für erweiterte Berechtigungsprüfung (Phase 6)
+2. Vollständige Kernel-Integration mit Login-Flow (Phase 7)
+3. Umfassende End-to-End Tests (Phase 8)
 
 ## 🐛 Bekannte Einschränkungen
 
@@ -224,6 +276,41 @@ exit       - Fährt das System herunter
 - Memory-Management muss beachtet werden (OS-Entwicklung)
 
 ## 📝 Changelog
+
+### Version 0.5.1 (2025-10-22)
+- 🐛 **Kritischer Bugfix**: AuthenticationManager Synchronisationsproblem behoben
+  - **Problem**: Invalid Opcode (06) in Permission-Tests durch NullReferenceException
+  - **Ursache**: AuthenticationManager hielt Kopie statt Referenz der User-Liste
+  - **Folge**: Login-Fehler bei neu erstellten Benutzern → CurrentUser = null → Crash
+  - **Lösung**: GetInternalUserList() statt GetAllUsers() für gemeinsame Referenz
+  - **Betroffene Dateien**: CommandHandlerTest.cs, Kernel.cs
+- 🐛 **Bugfix**: VM-Crash in ConsoleHelper-Tests behoben
+  - **Problem**: VM schloss sich automatisch während der letzten Tests
+  - **Ursache**: String-Methoden (.Contains(), .StartsWith(), .EndsWith()) verursachen Crashes in Cosmos OS
+  - **Lösung**: Ersetzt durch IndexOf() und Character-Array-Zugriff
+  - **Betroffene Dateien**: CommandHandlerTest.cs (Tests 25-30)
+- 🐛 **Bugfix**: Enum.Equals() Exception in Permission-Tests behoben
+  - **Problem**: "enum.equals not supported yet" Exception in AssertEquals
+  - **Ursache**: Cosmos OS unterstützt Equals()-Methode für Enums nicht
+  - **Lösung**: Cast zu int für Enum-Vergleiche, ToString() für andere Typen
+  - **Betroffene Dateien**: CommandHandlerTest.cs (AssertEquals Methode)
+
+### Version 0.5.0 (2025-10-21)
+- ✅ Phase 5 komplett implementiert
+- ✅ ConsoleHelper mit UI-Hilfsfunktionen
+  - Maskierte Passwort-Eingabe
+  - Farbige Statusmeldungen
+  - Formatierte Tabellen und Header
+  - Bestätigungs-Dialoge
+- ✅ CommandHandler mit vollständiger Benutzerverwaltung
+  - 10 Befehle implementiert (login, logout, whoami, passwd, useradd, userdel, usermod, userlist, userstats)
+  - Intelligentes Command-Parsing mit Anführungszeichen-Support
+  - Automatische Berechtigungsprüfung
+- ✅ Kernel-Integration
+  - CommandHandler in Kernel integriert
+  - Neue Befehle: testp5, userhelp
+- ✅ 30 neue automatisierte Tests für Phase 5
+- ✅ Vollständige Dokumentation aktualisiert
 
 ### Version 0.4.0 (2025-10-21)
 - ✅ Phase 4 komplett implementiert
@@ -277,6 +364,6 @@ Dieses Projekt ist ein Lernprojekt und steht unter einer freien Lizenz.
 
 ---
 
-**Letztes Update:** 2025-10-21  
-**Version:** 0.4.0  
+**Letztes Update:** 2025-10-22  
+**Version:** 0.5.1  
 **Status:** In Entwicklung

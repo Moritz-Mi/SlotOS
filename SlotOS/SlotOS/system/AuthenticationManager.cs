@@ -240,9 +240,10 @@ namespace SlotOS.System
             if (_users == null)
                 return null;
 
+            // Cosmos OS compatible: use ToLower() instead of StringComparison
             foreach (var user in _users)
             {
-                if (user.Username.Equals(username, StringComparison.OrdinalIgnoreCase))
+                if (user.Username.ToLower() == username.ToLower())
                 {
                     return user;
                 }

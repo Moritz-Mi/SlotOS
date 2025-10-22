@@ -184,36 +184,83 @@ public enum UserRole
 
 ---
 
-## Phase 5: Kommandozeilen-Interface
+## Phase 5: Kommandozeilen-Interface ✅ ABGESCHLOSSEN
 
-### 5.1 Login-Screen
-**Funktion:** `DisplayLoginScreen()`
+### 5.1 ConsoleHelper-Klasse ✅
+**Datei:** `ConsoleHelper.cs`
 
-- Benutzername-Eingabe
-- Passwort-Eingabe (versteckt mit ***)
-- Login-Versuche limitieren (max. 3 Versuche)
-- Fehlermeldungen anzeigen
+**UI-Hilfsfunktionen:**
+- `ReadPassword()` - Maskierte Passwort-Eingabe mit Sternchen
+- `WriteSuccess()`, `WriteError()`, `WriteWarning()`, `WriteInfo()` - Farbige Statusmeldungen
+- `WriteHeader()` - Formatierter Header mit Rahmen
+- `WriteSeparator()` - Trennlinien
+- `WriteTableRow()`, `WriteTableHeader()` - Tabellen-Ausgabe
+- `Confirm()` - Ja/Nein-Abfrage
+- `DisplayLoginScreen()` - Login-Bildschirm
+- `FormatRole()`, `FormatStatus()`, `FormatTimeSpan()` - Formatierungs-Funktionen
+- `PadRight()`, `Truncate()` - String-Hilfsfunktionen
 
-### 5.2 Benutzerverwaltungs-Befehle
+**Implementiert am:** 2025-10-21
+
+### 5.2 CommandHandler-Klasse ✅
+**Datei:** `CommandHandler.cs`
+
+**Benutzerverwaltungs-Befehle implementiert:**
+
+**Für alle Benutzer:**
+- `login` - Benutzer anmelden (mit Login-Screen)
+- `logout` - Benutzer abmelden
+- `whoami` - Aktuellen Benutzer anzeigen
+- `passwd` - Eigenes Passwort ändern
 
 **Für Admin-Benutzer:**
 - `useradd <username> <password> [role]` - Benutzer hinzufügen
-- `userdel <username>` - Benutzer löschen
-- `usermod <username> [optionen]` - Benutzer bearbeiten
-- `userlist` - Alle Benutzer auflisten
-- `passwd <username>` - Passwort ändern (Admin)
+- `userdel <username>` - Benutzer löschen (mit Bestätigung)
+- `usermod <username> <option> <wert>` - Benutzer bearbeiten
+  - Optionen: `role`, `active`, `home`
+- `userlist` - Alle Benutzer auflisten (formatierte Tabelle)
+- `passwd <username>` - Passwort für Benutzer zurücksetzen (Admin)
+- `userstats` - Benutzerstatistiken anzeigen
 
-**Für alle Benutzer:**
-- `passwd` - Eigenes Passwort ändern
-- `whoami` - Aktuellen Benutzer anzeigen
-- `logout` - Abmelden
+**Features:**
+- Intelligentes Command-Parsing (unterstützt Anführungszeichen)
+- Automatische Berechtigungsprüfung
+- Farbige, formatierte Ausgaben
+- Interaktive Passwort-Eingabe
+- Bestätigungs-Dialoge für kritische Operationen
+- Hilfe-System (`userhelp`)
+- Integration mit AuthenticationManager und UserManager
 
-### 5.3 CommandHandler-Klasse
-**Datei:** `CommandHandler.cs`
+**Implementiert am:** 2025-10-21
 
-- Befehle parsen und an entsprechende Manager weiterleiten
-- Berechtigungsprüfung vor Ausführung
-- Hilfe-System (`help`, `man`)
+### 5.3 Kernel-Integration ✅
+**Datei:** `Kernel.cs`
+
+**Änderungen:**
+- UserManager, AuthenticationManager, CommandHandler initialisiert in `BeforeRun()`
+- Befehle werden zuerst von CommandHandler verarbeitet
+- Neue Befehle:
+  - `testp5` / `testcommands` - Führt Phase 5 Tests aus
+  - `userhelp` - Zeigt Benutzerverwaltungs-Befehle
+- Alle Benutzerverwaltungs-Befehle sind nun im System verfügbar
+
+**Implementiert am:** 2025-10-21
+
+### 5.4 Tests ✅
+**Datei:** `CommandHandlerTest.cs`
+
+**30 automatisierte Tests:**
+- CommandHandler-Tests (6 Tests)
+- Command-Parsing-Tests (3 Tests)
+- Berechtigungs-Tests (3 Tests)
+- Benutzerverwaltungs-Tests (7 Tests)
+- Passwort-Management-Tests (2 Tests)
+- UserMod-Tests (4 Tests)
+- ConsoleHelper-Tests (5 Tests)
+
+**Test-Befehl:** `testp5` oder `testcommands`
+
+**Implementiert am:** 2025-10-21
 
 ---
 
@@ -337,13 +384,15 @@ protected override void Run()
 - [x] Auto-Save-Funktionalität
 - [x] Tests für Persistenz (23 Tests)
 
-### Sprint 4: Befehle (Woche 4)
-- [ ] CommandHandler erstellen
-- [ ] Alle Benutzerverwaltungs-Befehle
-- [ ] Hilfe-System
+### Sprint 4: Befehle (Woche 4) ✅
+- [x] CommandHandler erstellen
+- [x] Alle Benutzerverwaltungs-Befehle
+- [x] Hilfe-System
+- [x] ConsoleHelper für UI-Funktionen
+- [x] Tests für Phase 5 (30 Tests)
 
-### Sprint 5: Integration & Testing (Woche 5)
-- [ ] In Kernel integrieren
+### Sprint 5: Integration & Testing (Woche 5) 🔄 In Arbeit
+- [x] In Kernel integrieren
 - [ ] Alle Test-Szenarien durchführen
 - [ ] Bugs fixen
 
