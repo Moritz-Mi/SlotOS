@@ -374,7 +374,7 @@ protected override void Run()
    - Admin-Befehle als Standard-User blockiert
    - Admin kann alle Befehle ausführen
 
-5. **Persistenz**
+5. **Persistenz** wird nicht im
    - Daten bleiben nach Neustart erhalten
    - Backup/Restore funktioniert
 

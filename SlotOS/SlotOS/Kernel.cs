@@ -14,10 +14,10 @@ namespace SlotOS
 
         protected override void BeforeRun()
         {
-            Console.WriteLine("SlotOS gestartet!");
-            Console.WriteLine("Gib 'test' ein, um das Nutzerverwaltungssystem zu testen.");
-            Console.WriteLine("Gib 'testp6' ein, um das Berechtigungssystem zu testen.");
-            Console.WriteLine("Gib 'help' ein für eine Liste der Befehle.");
+            Console.Clear();
+            Console.WriteLine("======================================");
+            Console.WriteLine("   SlotOS - User Management System   ");
+            Console.WriteLine("======================================");
             Console.WriteLine();
 
             // Initialisiere User Management System
@@ -28,11 +28,34 @@ namespace SlotOS
             // FIX: Verwende GetInternalUserList() für gemeinsame Referenz
             authManager.SetUsers(userManager.GetInternalUserList());
             commandHandler = new CommandHandler(userManager, authManager);
+
+            // Zeige Login-Screen
+            Console.WriteLine("Bitte melden Sie sich an, um das System zu nutzen.");
+            Console.WriteLine("Standard-Login: admin / admin");
+            Console.WriteLine("Geben Sie 'login' ein, um sich anzumelden.");
+            Console.WriteLine();
         }
 
         protected override void Run()
         {
-            Console.Write("SlotOS> ");
+            // Prüfe Session-Timeout (30 Minuten Inaktivität)
+            if (authManager.IsAuthenticated && authManager.CheckAndHandleSessionTimeout(30))
+            {
+                ConsoleHelper.WriteWarning("Session abgelaufen aufgrund von Inaktivität");
+                AuditLogger.Instance.LogSessionTimeout(authManager.GetCurrentUsername());
+                ConsoleHelper.WriteInfo("Bitte melden Sie sich erneut an.");
+            }
+
+            // Zeige Prompt mit Benutzername wenn angemeldet
+            if (authManager.IsAuthenticated)
+            {
+                Console.Write($"{authManager.CurrentUser.Username}@SlotOS> ");
+            }
+            else
+            {
+                Console.Write("SlotOS (nicht angemeldet)> ");
+            }
+
             var input = Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(input))
@@ -46,7 +69,7 @@ namespace SlotOS
                 return; // Befehl wurde von CommandHandler verarbeitet
             }
 
-            // System-Befehle
+            // System-Befehle (einige erfordern Authentication)
             switch (command)
             {
                 case "test":
@@ -80,14 +103,34 @@ namespace SlotOS
                     Console.WriteLine();
                     break;
 
+                case "auditlog":
+                    // Zeige Audit-Log (nur Admin)
+                    if (!authManager.IsAuthenticated)
+                    {
+                        ConsoleHelper.WriteError("Sie müssen angemeldet sein");
+                    }
+                    else if (authManager.CurrentUser.Role != UserRole.Admin)
+                    {
+                        ConsoleHelper.WriteError("Dieser Befehl erfordert Administrator-Rechte");
+                    }
+                    else
+                    {
+                        Console.WriteLine();
+                        AuditLogger.Instance.FormatLogs(20); // Gibt direkt auf Console aus
+                        Console.WriteLine();
+                    }
+                    break;
+
                 case "help":
                     Console.WriteLine();
                     Console.WriteLine("Verfügbare System-Befehle:");
+                    Console.WriteLine("  login         - Meldet einen Benutzer an");
                     Console.WriteLine("  test          - Führt Tests für Phase 1-3 aus");
                     Console.WriteLine("  testp4        - Führt In-Memory Tests für Phase 4 aus");
                     Console.WriteLine("  testp5        - Führt Command Handler Tests für Phase 5 aus");
                     Console.WriteLine("  testp6        - Führt Permission Checker Tests für Phase 6 aus");
                     Console.WriteLine("  userhelp      - Zeigt Benutzerverwaltungs-Befehle an");
+                    Console.WriteLine("  auditlog      - Zeigt Audit-Log an (nur Admin)");
                     Console.WriteLine("  help          - Zeigt diese Hilfe an");
                     Console.WriteLine("  clear         - Löscht den Bildschirm");
                     Console.WriteLine("  exit          - Beendet das System");
@@ -104,6 +147,12 @@ namespace SlotOS
                     break;
 
                 case "exit":
+                    if (authManager.IsAuthenticated)
+                    {
+                        ConsoleHelper.WriteInfo($"Benutzer '{authManager.CurrentUser.Username}' wird abgemeldet...");
+                        AuditLogger.Instance.LogLogout(authManager.CurrentUser.Username);
+                        authManager.Logout();
+                    }
                     Console.WriteLine("System wird heruntergefahren...");
                     Sys.Power.Shutdown();
                     break;

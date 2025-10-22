@@ -125,8 +125,27 @@ SlotOS ist ein lernorientiertes OS-Projekt, das ein vollständiges Benutzerverwa
 - **Tests**: 42 automatisierte Tests in `PermissionCheckerTest.cs`
 - **Befehl**: `testp6` oder `testpermissions`
 
+#### Phase 7: Kernel-Integration ✅
+- **AuditLogger**:
+  - Singleton-Logger für sicherheitsrelevante Ereignisse
+  - In-Memory-Speicherung (max. 100 Einträge)
+  - Protokollierung von Login, Logout, User-Management-Aktionen
+  - Formatierte Log-Ausgabe für Administratoren
+- **Kernel.cs Erweiterungen**:
+  - Login-Screen beim Systemstart
+  - Dynamischer Prompt mit Benutzernamen (`username@SlotOS>`)
+  - Session-Timeout-Prüfung (30 Minuten Inaktivität)
+  - Automatischer Logout bei Timeout
+  - Audit-Logging für alle kritischen Aktionen
+- **Neue Befehle**:
+  - `auditlog` - Zeigt Audit-Log an (nur Admin)
+- **Sicherheitsfeatures**:
+  - Session-Management mit automatischer Abmeldung
+  - Vollständige Protokollierung aller Admin-Aktionen
+  - Logout beim System-Shutdown
+- **Dokumentation**: `PHASE7_IMPLEMENTATION.md`
+
 ### 🚧 In Planung
-- **Phase 7**: Vollständige Kernel-Integration mit Login-Flow
 - **Phase 8**: Testing & Validierung
 - **Phase 9**: Erweiterte Features (Optional)
 
@@ -155,10 +174,10 @@ dotnet build
 
 Im laufenden SlotOS:
 ```
-SlotOS> test       # Phase 1-3 Tests (23 Tests)
-SlotOS> testp4     # Phase 4 In-Memory Tests (18 Tests)
-SlotOS> testp5     # Phase 5 Command Handler Tests (30 Tests)
-SlotOS> testp6     # Phase 6 Permission Checker Tests (42 Tests)
+SlotOS (nicht angemeldet)> test       # Phase 1-3 Tests (23 Tests)
+SlotOS (nicht angemeldet)> testp4     # Phase 4 In-Memory Tests (18 Tests)
+SlotOS (nicht angemeldet)> testp5     # Phase 5 Command Handler Tests (30 Tests)
+SlotOS (nicht angemeldet)> testp6     # Phase 6 Permission Checker Tests (42 Tests)
 ```
 
 Zeigt alle verfügbaren Befehle:
@@ -183,6 +202,7 @@ SlotOS/
 │       ├── CommandHandler.cs          # Befehls-Verarbeitung (Phase 5)
 │       ├── ConsoleHelper.cs           # UI-Hilfsfunktionen (Phase 5)
 │       ├── PermissionChecker.cs       # Berechtigungssystem (Phase 6)
+│       ├── AuditLogger.cs             # Audit-Logging (Phase 7)
 │       ├── UserSystemTest.cs          # Automatisierte Tests (Phase 1-3)
 │       ├── InMemoryTest.cs            # In-Memory-Tests (Phase 4)
 │       ├── CommandHandlerTest.cs      # Command-Tests (Phase 5)
@@ -190,6 +210,7 @@ SlotOS/
 ├── NUTZERVERWALTUNG_PLAN.md          # Detaillierter Implementierungsplan
 ├── TESTING.md                         # Test-Dokumentation
 ├── IN_MEMORY_MODE.md                  # In-Memory-Modus Dokumentation
+├── PHASE7_IMPLEMENTATION.md           # Phase 7 Dokumentation
 └── README.md                          # Diese Datei
 ```
 
@@ -238,10 +259,12 @@ Siehe [TESTING.md](TESTING.md) für Details.
 ### System-Befehle
 
 ```
+login         - Meldet einen Benutzer an
 test          - Führt alle automatischen Tests (Phase 1-3) aus
 testp4        - Führt In-Memory-Tests (Phase 4) aus
 testp5        - Führt Command-Handler-Tests (Phase 5) aus
 testp6        - Führt Permission-Checker-Tests (Phase 6) aus
+auditlog      - Zeigt Audit-Log an (nur Admin)
 help          - Zeigt System-Befehlsliste an
 userhelp      - Zeigt Benutzerverwaltungs-Befehle an
 clear         - Löscht den Bildschirm
@@ -279,9 +302,11 @@ userstats                                - Benutzerstatistiken anzeigen
 - ✅ Phase 4: Datenpersistenz / In-Memory-Modus (100%)
 - ✅ Phase 5: Kommandozeilen-Interface (100%)
 - ✅ Phase 6: Berechtigungssystem (100%)
+- ✅ Phase 7: Kernel-Integration (100%)
 
-**In Arbeit:**
-- 🚧 Phase 7: Kernel-Integration mit Login-Flow (0%)
+**In Planung:**
+- 🚧 Phase 8: Testing & Validierung
+- 🚧 Phase 9: Erweiterte Features (Optional)
 
 ### Code-Stil
 
@@ -292,9 +317,9 @@ userstats                                - Benutzerstatistiken anzeigen
 
 ### Nächste Schritte
 
-1. Vollständige Kernel-Integration mit Login-Flow (Phase 7)
-2. CommandHandler-Integration mit PermissionChecker
-3. Umfassende End-to-End Tests (Phase 8)
+1. Umfassende End-to-End Tests (Phase 8)
+2. Erweiterte Features wie Log-Filter, Persistente Logs (Phase 9)
+3. Performance-Optimierungen
 
 ## 🐛 Bekannte Einschränkungen
 
@@ -304,6 +329,27 @@ userstats                                - Benutzerstatistiken anzeigen
 - Memory-Management muss beachtet werden (OS-Entwicklung)
 
 ## 📝 Changelog
+
+### Version 0.7.0 (2025-10-22)
+- ✅ Phase 7 komplett implementiert
+- ✅ AuditLogger für sicherheitsrelevante Ereignisse
+  - Singleton-Pattern für zentrale Verwaltung
+  - In-Memory-Speicherung (max. 100 Einträge)
+  - Protokollierung von Login, Logout, User-Management
+  - Formatierte Log-Ausgabe für Administratoren
+- ✅ Kernel-Integration
+  - Login-Screen beim Systemstart
+  - Dynamischer Prompt mit Benutzernamen
+  - Session-Timeout-Prüfung (30 Minuten)
+  - Automatischer Logout bei Inaktivität
+  - Audit-Logging beim Exit
+- ✅ CommandHandler-Integration
+  - Audit-Logging für alle Admin-Aktionen
+  - Login/Logout werden protokolliert
+  - Passwort-Änderungen werden geloggt
+- ✅ Neuer Befehl: auditlog (nur Admin)
+- ✅ Vollständige Dokumentation (PHASE7_IMPLEMENTATION.md)
+- ✅ System ist produktionsreif für In-Memory-Betrieb
 
 ### Version 0.6.0 (2025-10-22)
 - ✅ Phase 6 komplett implementiert
@@ -413,5 +459,5 @@ Dieses Projekt ist ein Lernprojekt und steht unter einer freien Lizenz.
 ---
 
 **Letztes Update:** 2025-10-22  
-**Version:** 0.6.0  
-**Status:** In Entwicklung
+**Version:** 0.7.0  
+**Status:** Produktionsreif (In-Memory-Modus)
