@@ -102,8 +102,30 @@ SlotOS ist ein lernorientiertes OS-Projekt, das ein vollständiges Benutzerverwa
 - **Tests**: 30 automatisierte Tests in `CommandHandlerTest.cs`
 - **Befehl**: `testp5` oder `testcommands`
 
+#### Phase 6: Berechtigungssystem ✅
+- **PermissionChecker**:
+  - Singleton-Pattern für zentrale Berechtigungsverwaltung
+  - 15 vordefinierte Aktionen (Benutzer, Dateien, System, Logs)
+  - Rollenbasierte Zugriffskontrolle (Admin, Standard, Guest)
+  - Dateisystem-Berechtigungen mit Pfad-basierter Prüfung
+  - Exception-basierte Zugriffsverweigerung
+- **Berechtigungs-Matrix**:
+  - Admin: Volle Systemrechte, alle Dateien und Verzeichnisse
+  - Standard: Eigenes Home-Verzeichnis, öffentliche Dateien lesen
+  - Gast: Nur Lesezugriff auf eigenes Home und öffentliche Dateien
+- **Pfad-Schutz**:
+  - System-Verzeichnisse (`/system/`, `/boot/`) nur für Admin
+  - Home-Verzeichnisse pro Benutzer geschützt
+  - Öffentliche Bereiche (`/public/`) für alle lesbar
+- **Methoden**:
+  - `HasPermission()` - Berechtigungsprüfung
+  - `RequirePermission()` - Exception bei fehlender Berechtigung
+  - `CanAccessFile()` - Dateizugriffsprüfung
+  - `GetPermissionSummary()` - Berechtigungsübersicht
+- **Tests**: 42 automatisierte Tests in `PermissionCheckerTest.cs`
+- **Befehl**: `testp6` oder `testpermissions`
+
 ### 🚧 In Planung
-- **Phase 6**: Berechtigungssystem
 - **Phase 7**: Vollständige Kernel-Integration mit Login-Flow
 - **Phase 8**: Testing & Validierung
 - **Phase 9**: Erweiterte Features (Optional)
@@ -136,6 +158,7 @@ Im laufenden SlotOS:
 SlotOS> test       # Phase 1-3 Tests (23 Tests)
 SlotOS> testp4     # Phase 4 In-Memory Tests (18 Tests)
 SlotOS> testp5     # Phase 5 Command Handler Tests (30 Tests)
+SlotOS> testp6     # Phase 6 Permission Checker Tests (42 Tests)
 ```
 
 Zeigt alle verfügbaren Befehle:
@@ -159,9 +182,11 @@ SlotOS/
 │       ├── UserManager.cs             # Benutzerverwaltung
 │       ├── CommandHandler.cs          # Befehls-Verarbeitung (Phase 5)
 │       ├── ConsoleHelper.cs           # UI-Hilfsfunktionen (Phase 5)
+│       ├── PermissionChecker.cs       # Berechtigungssystem (Phase 6)
 │       ├── UserSystemTest.cs          # Automatisierte Tests (Phase 1-3)
 │       ├── InMemoryTest.cs            # In-Memory-Tests (Phase 4)
-│       └── CommandHandlerTest.cs      # Command-Tests (Phase 5)
+│       ├── CommandHandlerTest.cs      # Command-Tests (Phase 5)
+│       └── PermissionCheckerTest.cs   # Permission-Tests (Phase 6)
 ├── NUTZERVERWALTUNG_PLAN.md          # Detaillierter Implementierungsplan
 ├── TESTING.md                         # Test-Dokumentation
 ├── IN_MEMORY_MODE.md                  # In-Memory-Modus Dokumentation
@@ -172,9 +197,9 @@ SlotOS/
 
 ### Automatische Tests
 
-SlotOS enthält eine umfassende Test-Suite für Phase 1-5:
+SlotOS enthält eine umfassende Test-Suite für Phase 1-6:
 
-- **71 automatisierte Tests** (23 für Phase 1-3, 18 für Phase 4, 30 für Phase 5)
+- **113 automatisierte Tests** (23 für Phase 1-3, 18 für Phase 4, 30 für Phase 5, 42 für Phase 6)
 - Tests für alle Kernfunktionen
 - Detaillierte Fehlerberichte
 
@@ -185,6 +210,7 @@ Siehe [TESTING.md](TESTING.md) für Details.
 1. **Phase 1-3 Tests**: User-Erstellung, Rollen, Passwort-Updates, Hashing, Verifikation, Login, Logout, CRUD-Operationen
 2. **Phase 4 Tests**: In-Memory-Betrieb, Standard-Admin, Neustart-Simulation, Performance
 3. **Phase 5 Tests**: CommandHandler, Command-Parsing, Berechtigungen, Benutzerverwaltungs-Befehle, Passwort-Management, UserMod, ConsoleHelper
+4. **Phase 6 Tests**: PermissionChecker, Rollenbasierte Berechtigungen, Dateizugriff, Exception-Handling, Pfad-Prüfung
 
 ## 🔒 Sicherheit
 
@@ -215,6 +241,7 @@ Siehe [TESTING.md](TESTING.md) für Details.
 test          - Führt alle automatischen Tests (Phase 1-3) aus
 testp4        - Führt In-Memory-Tests (Phase 4) aus
 testp5        - Führt Command-Handler-Tests (Phase 5) aus
+testp6        - Führt Permission-Checker-Tests (Phase 6) aus
 help          - Zeigt System-Befehlsliste an
 userhelp      - Zeigt Benutzerverwaltungs-Befehle an
 clear         - Löscht den Bildschirm
@@ -251,9 +278,10 @@ userstats                                - Benutzerstatistiken anzeigen
 - ✅ Phase 3: Benutzerverwaltung (100%)
 - ✅ Phase 4: Datenpersistenz / In-Memory-Modus (100%)
 - ✅ Phase 5: Kommandozeilen-Interface (100%)
+- ✅ Phase 6: Berechtigungssystem (100%)
 
 **In Arbeit:**
-- 🚧 Phase 6: Berechtigungssystem (0%)
+- 🚧 Phase 7: Kernel-Integration mit Login-Flow (0%)
 
 ### Code-Stil
 
@@ -264,8 +292,8 @@ userstats                                - Benutzerstatistiken anzeigen
 
 ### Nächste Schritte
 
-1. PermissionChecker für erweiterte Berechtigungsprüfung (Phase 6)
-2. Vollständige Kernel-Integration mit Login-Flow (Phase 7)
+1. Vollständige Kernel-Integration mit Login-Flow (Phase 7)
+2. CommandHandler-Integration mit PermissionChecker
 3. Umfassende End-to-End Tests (Phase 8)
 
 ## 🐛 Bekannte Einschränkungen
@@ -276,6 +304,26 @@ userstats                                - Benutzerstatistiken anzeigen
 - Memory-Management muss beachtet werden (OS-Entwicklung)
 
 ## 📝 Changelog
+
+### Version 0.6.0 (2025-10-22)
+- ✅ Phase 6 komplett implementiert
+- ✅ PermissionChecker mit umfassendem Berechtigungssystem
+  - Singleton-Pattern für zentrale Verwaltung
+  - 15 vordefinierte Aktionen für verschiedene System-Bereiche
+  - Rollenbasierte Zugriffskontrolle (Admin, Standard, Guest)
+  - Dateisystem-Berechtigungen mit Pfad-basierter Prüfung
+  - Exception-basierte Zugriffsverweigerung
+- ✅ Berechtigungs-Matrix implementiert
+  - Admin: Volle Systemrechte
+  - Standard: Eigenes Home + öffentliche Dateien
+  - Gast: Nur Lesezugriff
+- ✅ Pfad-Schutz implementiert
+  - System-Verzeichnisse nur für Admin
+  - Home-Verzeichnisse pro Benutzer
+  - Öffentliche Bereiche für alle lesbar
+- ✅ 42 neue automatisierte Tests für Phase 6
+- ✅ Kernel-Integration (testp6 Befehl)
+- ✅ Vollständige Dokumentation (PHASE6_IMPLEMENTATION.md)
 
 ### Version 0.5.1 (2025-10-22)
 - 🐛 **Kritischer Bugfix**: AuthenticationManager Synchronisationsproblem behoben
@@ -365,5 +413,5 @@ Dieses Projekt ist ein Lernprojekt und steht unter einer freien Lizenz.
 ---
 
 **Letztes Update:** 2025-10-22  
-**Version:** 0.5.1  
+**Version:** 0.6.0  
 **Status:** In Entwicklung

@@ -16,6 +16,7 @@ namespace SlotOS
         {
             Console.WriteLine("SlotOS gestartet!");
             Console.WriteLine("Gib 'test' ein, um das Nutzerverwaltungssystem zu testen.");
+            Console.WriteLine("Gib 'testp6' ein, um das Berechtigungssystem zu testen.");
             Console.WriteLine("Gib 'help' ein für eine Liste der Befehle.");
             Console.WriteLine();
 
@@ -71,12 +72,21 @@ namespace SlotOS
                     Console.WriteLine();
                     break;
 
+                case "testp6":
+                case "testpermissions":
+                    // Führe Permission Checker Tests aus (Phase 6)
+                    Console.WriteLine();
+                    PermissionCheckerTest.RunAllTests();
+                    Console.WriteLine();
+                    break;
+
                 case "help":
                     Console.WriteLine();
                     Console.WriteLine("Verfügbare System-Befehle:");
                     Console.WriteLine("  test          - Führt Tests für Phase 1-3 aus");
                     Console.WriteLine("  testp4        - Führt In-Memory Tests für Phase 4 aus");
                     Console.WriteLine("  testp5        - Führt Command Handler Tests für Phase 5 aus");
+                    Console.WriteLine("  testp6        - Führt Permission Checker Tests für Phase 6 aus");
                     Console.WriteLine("  userhelp      - Zeigt Benutzerverwaltungs-Befehle an");
                     Console.WriteLine("  help          - Zeigt diese Hilfe an");
                     Console.WriteLine("  clear         - Löscht den Bildschirm");
